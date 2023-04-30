@@ -1,11 +1,5 @@
 import csv
 
-def max_length(array, currentMax) :
-    if len(array) > currentMax:
-        return len(array)
-    else:
-        return currentMax
-
 # Wipe the well list, data, constituents and facility clean
 with open('wells.csv', 'w') as well_output:
     print('wellID, ' + 'name, ' + 'gradient', file=well_output)
