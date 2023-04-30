@@ -1,0 +1,6 @@
+LOAD DATA LOCAL INFILE 'C:/StatPythonDB/StatPythonDB/constituents.csv'
+INTO TABLE gwstats.constituent
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
