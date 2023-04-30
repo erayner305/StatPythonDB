@@ -1,4 +1,4 @@
-wellID, constituentID, mdl, pql, observed, sampleDate
+wellID,constituentID,mdl,pql,observed,sampleDate
 1,0,NULL,NULL,<0.003,2016-03-02
 1,0,NULL,NULL,<0.003,2016-04-19
 1,0,NULL,NULL,<0.003,2016-06-08
