@@ -41,12 +41,18 @@ cnx.close()
 yAxisLimUp = maxVal
 yAxisLimDown = 0
 
-for well in data:
-    plt.plot(data[well][0], data[well][1], label=well)
+fig, axes = plt.subplots(2,2)
 
-plt.yticks([yAxisLimDown, (yAxisLimUp - yAxisLimDown) * 1/4 , (yAxisLimUp - yAxisLimDown) * 1/2  , (yAxisLimUp - yAxisLimDown) * 3/4 , yAxisLimUp])
-plt.xlabel('Date')
-plt.ylabel('Antimony')
-plt.title('Antimony levels by well')
-plt.legend()
+for i in range(len(axes)):
+    for j in range(len(axes[i])):
+        ax = axes[i][j]
+        for well in data:
+            ax.plot(data[well][0], data[well][1], 'o--', lw=0.7, ms=5, label=well)
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Antimony (mg/L)')
+
+
+
+yAxisRange = yAxisLimDown - yAxisLimDown
+plt.yticks([yAxisLimDown, yAxisRange * 1/4 , yAxisRange * 1/2  , yAxisRange * 3/4 , yAxisLimUp])
 plt.show()
