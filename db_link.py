@@ -2,10 +2,15 @@ import mysql.connector
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import re
+import json
 
-cnx = mysql.connector.connect(user='root', password='Wekljor#1',
-                              host='104.222.17.66', database='gwstats')
+MAX_WELLS = 20
+
+with open('db_info.json') as f:
+    db_info = json.load(f)
+
+cnx = mysql.connector.connect(user=db_info['user'], password=db_info['password'],
+                              host=db_info['host'], database=db_info['database'])
 
 cursor = cnx.cursor()
 
@@ -29,11 +34,11 @@ for (wellName, sampleDate, observed) in cursor:
 
     if not(wellName in data):
         data[wellName] = {}
-        data[wellName][0] = []
-        data[wellName][1] = []
+        data[wellName]['dates'] = []
+        data[wellName]['values'] = []
 
-    data[wellName][0].append(sampleDate)
-    data[wellName][1].append(observedNum)
+    data[wellName]['dates'].append(sampleDate)
+    data[wellName]['values'].append(observedNum)
 
 cursor.close()
 cnx.close()
@@ -41,18 +46,46 @@ cnx.close()
 yAxisLimUp = maxVal
 yAxisLimDown = 0
 
-fig, axes = plt.subplots(2,2)
+fig, axes = plt.subplots( int(np.ceil(np.ceil(len(data)/(MAX_WELLS))/2)) , 2, figsize=(12, 12), layout = 'none' )
+
+breakOuter=False
+dataSplits = 1
 
 for i in range(len(axes)):
+    if breakOuter:
+        break
+
     for j in range(len(axes[i])):
+        if breakOuter:
+            break
+
         ax = axes[i][j]
-        for well in data:
-            ax.plot(data[well][0], data[well][1], 'o--', lw=0.7, ms=5, label=well)
-            ax.set_xlabel('Date')
-            ax.set_ylabel('Antimony (mg/L)')
+        for k, well in enumerate(data):
+
+                if k - (MAX_WELLS * dataSplits) == 0:
+                    
+                    if j == 1:
+                        i = i + 1
+                        j = 0
+                    else:
+                        j = 1
+
+                    dataSplits = dataSplits + 1     
+                    ax = axes[i][j]
+                
+                ax.plot(data[well]['dates'], data[well]['values'], 'o--', lw=0.7, ms=5, label=well)
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Antimony (mg/L)')
+                ax.grid(visible=True)
+                ax.autoscale(enable=True, axis = 'x', tight = True)
+                ax.autoscale(enable=True, axis = 'y')
+                ax.set_title("Time Series", pad = 10.0)
+                ax.legend(loc = 'right', bbox_to_anchor = (1.3, .5), frameon = False, handletextpad = 4)
+
+                if k == len(data) - 1:
+                    breakOuter = True
+                    break
 
 
-
-yAxisRange = yAxisLimDown - yAxisLimDown
-plt.yticks([yAxisLimDown, yAxisRange * 1/4 , yAxisRange * 1/2  , yAxisRange * 3/4 , yAxisLimUp])
+fig.subplots_adjust(hspace=.25, wspace=.55)
 plt.show()
